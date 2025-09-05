@@ -15,5 +15,5 @@ output "jenkins_public_ip" {
 }
 
 output "jenkins_url" {
-  value = "http://${}:8080"
+  value = "http://${aws_instance.jenkins.public_ip}:8080"
 }

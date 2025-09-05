@@ -1,9 +1,44 @@
-# Terraform
+# === Terraform ===
 .terraform/
 *.tfstate
 *.tfstate.*
 crash.log
-*.tfvars
-terraform.tfvars
 override.tf
 override.tf.json
+terraform.tfvars
+*.tfvars.json
+
+# Keep lock file (important for reproducibility)
+!.terraform.lock.hcl
+
+# === Ansible ===
+*.retry
+*.log
+inventory.ini  # si contiene credenciales, mejor ignorarlo
+
+# === Python App ===
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.venv/
+venv/
+
+# === Docker ===
+*.tar
+*.bak
+
+# === Kubernetes / Helm ===
+*.kubeconfig
+*.tgz
+chart-*.tgz
+
+# === Jenkins ===
+secrets/
+workspace/
+
+# === System ===
+.DS_Store
+Thumbs.db
+
