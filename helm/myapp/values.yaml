@@ -1,0 +1,23 @@
+# Default values for Cloud CI/CD Platform Helm chart.
+
+replicaCount: 2   # Number of pod replicas for high availability
+
+image:
+  repository: <AWS_ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/cloud-cicd-platform
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 5000  # Flask app default port
+
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - host: cicd-platform.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []   # Example: - secretName: cicd-platform-tls, hosts: [cicd-platform.local]
