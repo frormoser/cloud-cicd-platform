@@ -137,6 +137,46 @@ Contact & Ownership
 
 Federico Rormoser © 2025 — demo project. Contact: https://www.linkedin.com/in/federico-rormoser/ • https://github.com/frormoser/
 
+---
+
+Descripción corta (Español)
+
+Esta aplicación demo muestra métricas públicas de un perfil de GitHub de forma profesional y lista para entrevistas. Permite ingresar cualquier nombre de usuario público y ver: seguidores, repositorios públicos, estrellas totales, lenguajes usados y los repositorios más recientes. El proyecto está pensado como ejemplo de buenas prácticas de DevOps: incluye Docker, ejemplos de CI/CD (GitHub Actions y Jenkins), Helm y Terraform como punto de partida.
+
+Nombre de proyecto — Sugerencias
+
+- github-profile-metrics
+- devops-github-insights
+- profile-metrics-dashboard
+- repo-inspector
+- gh-metrics-dashboard
+- devops-profile-spotlight
+
+Nombre recomendado para Netlify: `github-profile-metrics-devops` (si ya existe, Netlify añadirá un sufijo).
+
+Cómo probar localmente (rápido)
+
+1. Construir y ejecutar con Docker (PowerShell):
+
+```powershell
+docker build -t gh-profile-demo -f app/Dockerfile app; 
+docker run -p 5000:5000 gh-profile-demo
+```
+
+2. Abrir http://localhost:5000 y escribir un usuario público de GitHub.
+
+Checklist para push (listo para entrevista)
+
+1. Asegúrate de tener todo commiteado:
+
+```powershell
+git add .; git commit -m "chore(demo): finalize UI, Netlify fallback, DevOps manifests, README"; git push origin main
+```
+
+2. (Opcional) Conectar el repositorio a Netlify y establecer el directorio de publicación a `app/src/static`.
+
+3. Compartir la URL con entrevistadores. Ellos pueden escribir un nombre de usuario público y ver las métricas.
+
 Architecture diagram (Mermaid)
 
 ```mermaid

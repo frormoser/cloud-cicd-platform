@@ -25,26 +25,60 @@ async function fetchProfile(username) {
   const reposResp = await fetch(`${gh}/users/${encodeURIComponent(username)}/repos?per_page=100`);
   const repos = reposResp.ok ? await reposResp.json() : [];
 
-  // Convert into the same shape as backend API for rendering simplicity
-  const total_stars = (repos || []).reduce((s,r)=>s+(r.stargazers_count||0),0);
-  const languages = {};
-  for (const r of (repos||[])) { const l = r.language||'Unknown'; languages[l] = (languages[l]||0)+1; }
+  // Helper: normalize language labels for nicer display (HCL, Dockerfile, etc.)
+  function normalizeLang(raw) {
+    if (!raw) return 'Unknown';
+    const s = String(raw).trim();
+    if (!s) return 'Unknown';
+    const lower = s.toLowerCase();
+    const map = { 'hcl': 'HCL', 'dockerfile': 'Dockerfile' };
+    if (map[lower]) return map[lower];
+    // Preserve common capitalization (e.g., 'JavaScript' or 'Go')
+    return s;
+  }
 
-  return { ok: true, profile: {
-    username: user.login,
-    name: user.name,
-    bio: user.bio,
-    avatar_url: user.avatar_url,
-    html_url: user.html_url,
-    followers: user.followers,
-    following: user.following,
-    public_repos: user.public_repos,
-    total_stars,
-    repo_count: (repos||[]).length,
-    top_repos: (repos||[]).sort((a,b)=> (b.stargazers_count||0)-(a.stargazers_count||0)).slice(0,6).map(r=>({name:r.name,html_url:r.html_url,stars:r.stargazers_count,language:r.language})),
-    languages,
-    recent_repo_updates_90d: 0,
-  }};
+  // Sort repositories by most recent push (newest first). Use pushed_at then updated_at.
+  function repoTimeKey(r) {
+    const t = r.pushed_at || r.updated_at || null;
+    return t ? new Date(t).getTime() : 0;
+  }
+
+  const sortedByRecent = (repos || []).slice().sort((a, b) => repoTimeKey(b) - repoTimeKey(a));
+
+  // Convert into the same shape as backend API for rendering simplicity
+  const total_stars = (repos || []).reduce((s, r) => s + (r.stargazers_count || 0), 0);
+  const languages = {};
+  for (const r of (repos || [])) {
+    const raw = r.language || null;
+    const l = normalizeLang(raw);
+    languages[l] = (languages[l] || 0) + 1;
+  }
+
+  return {
+    ok: true,
+    profile: {
+      username: user.login,
+      name: user.name,
+      bio: user.bio,
+      avatar_url: user.avatar_url,
+      html_url: user.html_url,
+      followers: user.followers,
+      following: user.following,
+      public_repos: user.public_repos,
+      total_stars,
+      repo_count: (repos || []).length,
+      // For the UI we show the most recently updated/pushed repos first so a
+      // candidate's latest work is visible immediately in the demo.
+      top_repos: sortedByRecent.slice(0, 6).map((r) => ({
+        name: r.name,
+        html_url: r.html_url,
+        stars: r.stargazers_count,
+        language: normalizeLang(r.language),
+      })),
+      languages,
+      recent_repo_updates_90d: 0,
+    },
+  };
 }
 
 function animateCount(el, target) {

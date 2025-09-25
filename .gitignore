@@ -43,6 +43,7 @@ workspace/
 Thumbs.db
 
 # Local/dev artifacts
+dist/
 dist.zip
 tmp_response.html
 netlify.toml
