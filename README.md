@@ -12,6 +12,9 @@ Key files
 - `app/Dockerfile` — Container image for the app
 - `.github/workflows/ci.yml` — CI workflow: install deps, run tests, build image
 
+<img width="929" height="1220" alt="image" src="https://github.com/user-attachments/assets/dad680b4-8c43-4b49-93ef-19414ca7b196" />
+
+
 Quick start (local)
 1. Build and run with Docker:
 
