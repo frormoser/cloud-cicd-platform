@@ -1,0 +1,39 @@
+---
+# Kubernetes bootstrap playbook (demo)
+# This playbook installs kubectl and Helm on target hosts and can be used to
+# prepare a bastion or CI runner that will perform helm upgrades against a
+# remote cluster using a provided kubeconfig.
+
+- name: Install kubectl and Helm on target hosts
+  hosts: k8s_nodes
+  become: true
+
+  tasks:
+    - name: Ensure curl and unzip present
+      package:
+        name:
+          - curl
+          - unzip
+        state: present
+
+    - name: Download kubectl
+      get_url:
+        url: "https://storage.googleapis.com/kubernetes-release/release/$(curl -sS https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
+        dest: /usr/local/bin/kubectl
+        mode: '0755'
+      register: kubectl_dl
+      failed_when: kubectl_dl is failed
+
+    - name: Install Helm
+      shell: curl -sSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+      args:
+        warn: false
+
+    - name: Ensure ~/.kube exists for connecting to cluster
+      file:
+        path: ~/.kube
+        state: directory
+        mode: '0700'
+
+  # Usage note: copy kubeconfig to remote host manually or use vault/ansible-vault
+  # for automation. This playbook focuses on client tooling installation.

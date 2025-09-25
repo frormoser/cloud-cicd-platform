@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cloud-cicd-platform
+  namespace: argocd
+spec:
+  project: cloud-cicd-demo
+  source:
+    repoURL: 'https://github.com/frormoser/cloud-cicd-platform'
+    path: helm/myapp
+    targetRevision: HEAD
+    helm:
+      valueFiles:
+        - values.yaml
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+
+# Note: This application assumes the repository is accessible by ArgoCD.
+# Replace repoURL with the real repository URL if different. Adjust
+# `destination.namespace` as required for your cluster.

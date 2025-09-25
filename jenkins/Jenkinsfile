@@ -79,10 +79,19 @@ pipeline {
                 script {
                     echo "📦 Deploying application to Kubernetes..."
                     try {
+                        // Option A: simple `kubectl set image` if you already have a Deployment
                         sh """
                             kubectl set image deployment/${K8S_DEPLOYMENT} ${K8S_CONTAINER}=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${ECR_REPO_NAME}:${IMAGE_TAG} --record
                             kubectl rollout status deployment/${K8S_DEPLOYMENT} --timeout=120s
                         """
+                        // Option B: (recommended) Deploy via Helm for declarative deployments.
+                        // Uncomment and adjust the next block to perform a Helm upgrade/install
+                        // using the provided chart in `helm/myapp`.
+                        //
+                        // withCredentials([string(credentialsId: 'EKS_KUBECONFIG', variable: 'KUBECONFIG_CONTENT')]) {
+                        //   sh 'echo "$KUBECONFIG_CONTENT" > kubeconfig && export KUBECONFIG=$PWD/kubeconfig'
+                        //   sh "helm upgrade --install ${ECR_REPO_NAME} helm/myapp --set image.repository=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${ECR_REPO_NAME},image.tag=${IMAGE_TAG}"
+                        // }
                         echo "✅ Deployment succeeded!"
                     } catch (err) {
                         echo "❌ Deployment failed! Rolling back..."

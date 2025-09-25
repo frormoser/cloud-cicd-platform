@@ -1,0 +1,16 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+	name: cloud-cicd-demo
+	namespace: argocd
+spec:
+	description: >-
+		Demo ArgoCD project for deploying the cloud-cicd-platform helm chart.
+	sourceRepos:
+		- 'https://github.com/frormoser/*'
+	destinations:
+		- namespace: default
+			server: https://kubernetes.default.svc
+	clusterResourceWhitelist:
+		- group: '*'
+			kind: '*'

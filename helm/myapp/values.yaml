@@ -3,7 +3,9 @@
 replicaCount: 2   # Number of pod replicas for high availability
 
 image:
-  repository: <AWS_ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/cloud-cicd-platform
+  # Default image repository for development/demo purposes. In CI set
+  # this value to your registry (GHCR, ECR, etc.) using --set or a values file.
+  repository: ghcr.io/frormoser/cloud-cicd-platform
   tag: latest
   pullPolicy: IfNotPresent
 

@@ -42,3 +42,14 @@ workspace/
 .DS_Store
 Thumbs.db
 
+# Local/dev artifacts
+dist.zip
+tmp_response.html
+netlify.toml
+terraform/tfplan
+.pytest_cache/
+.vscode/
+.idea/
+*.log
+__pycache__/
+
