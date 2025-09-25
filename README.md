@@ -127,10 +127,6 @@ Notes about avatar fallback and repo ordering
   first) so the UI highlights the candidate's most recent work. Language
   labels are normalized and unknown values are shown as `Unknown`.
 
-Netlify project name suggestion
-
-Use a short, professional name for the Netlify site. Suggested name:
-`github-profile-metrics-devops` (if taken, Netlify appends a suffix automatically).
 
 
 Contact & Ownership
@@ -143,16 +139,7 @@ Descripción corta (Español)
 
 Esta aplicación demo muestra métricas públicas de un perfil de GitHub de forma profesional y lista para entrevistas. Permite ingresar cualquier nombre de usuario público y ver: seguidores, repositorios públicos, estrellas totales, lenguajes usados y los repositorios más recientes. El proyecto está pensado como ejemplo de buenas prácticas de DevOps: incluye Docker, ejemplos de CI/CD (GitHub Actions y Jenkins), Helm y Terraform como punto de partida.
 
-Nombre de proyecto — Sugerencias
 
-- github-profile-metrics
-- devops-github-insights
-- profile-metrics-dashboard
-- repo-inspector
-- gh-metrics-dashboard
-- devops-profile-spotlight
-
-Nombre recomendado para Netlify: `github-profile-metrics-devops` (si ya existe, Netlify añadirá un sufijo).
 
 Cómo probar localmente (rápido)
 
