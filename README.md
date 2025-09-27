@@ -1,4 +1,4 @@
-# GitHub Profile Metrics — Demo
+# GitHub Profile Metrics
 
 This repository contains a small Flask-based demo that aggregates public GitHub
 profile metrics (followers, stars, repos, languages) and exposes a single-page
