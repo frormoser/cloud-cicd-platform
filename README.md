@@ -5,6 +5,8 @@ profile metrics (followers, stars, repos, languages) and exposes a single-page
 dashboard. It's built and organized with DevOps best practices in mind so you
 can extend it and deploy using Docker, CI/CD, Helm, and Terraform (examples
 already included in the repo structure).
+   
+🌍 [**Live Demo on Netlify**](https://github-profile-metrics-devops.netlify.app/)  
 
 Key files
 - `app/src/app.py` — Flask backend (API + static server)
@@ -174,9 +176,9 @@ Planned / Future improvements (explicitly documented)
 
 
 
-# 📫 Contact  
-## 👨‍💻 Federico Rormoser © 2025 
-<p align="center">
+# 👨‍💻 Author: 
+#  Federico Rormoser
+<p>
   <a href="mailto:joelrormoser@gmail.com">
     <img src="https://img.shields.io/badge/Email-D14836?style=for-the-badge&logo=gmail&logoColor=white" />
   </a>
