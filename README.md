@@ -14,7 +14,88 @@ Key files
 
 <img width="929" height="1220" alt="image" src="https://github.com/user-attachments/assets/dad680b4-8c43-4b49-93ef-19414ca7b196" />
 
+Architecture diagram (Mermaid)
+```mermaid
+flowchart LR
+  subgraph Dev
+    DevMachine[Developer Machine]
+    GitHub[GitHub Repo]
+  end
 
+  subgraph CI/CD
+    GH_Actions[GitHub Actions CI]
+    Jenkins[Jenkins - optional]
+    GHCR[Container Registry]
+  end
+
+  subgraph Infra
+    K8s[Kubernetes Cluster]
+    Argo[ArgoCD - optional]
+    S3[S3 artifacts]
+  end
+
+  DevMachine --> GitHub
+  GitHub --> GH_Actions
+  GH_Actions --> GHCR
+  GH_Actions --> Jenkins
+  GHCR --> K8s
+  Jenkins --> K8s
+  GitHub --> Argo
+  GH_Actions --> S3
+
+  K8s -->|serves| App[Flask App]
+  App -->|serves static| SPA[SPA static]
+  SPA -->|fetch| App
+  SPA -->|fallback| GitHub
+```
+
+🏗️ Project Structure
+```
+cloud-cicd-platform/
+├── README.md                # Main documentation
+├── ansible/                 # Automation playbooks
+│   ├── inventory.ini        # Host inventory
+│   ├── jenkins.yml          # Provisions Jenkins
+│   └── kubernetes.yml       # Installs kubectl/helm on build agents
+├── app/                     # Core application
+│   ├── Dockerfile           # Container image definition
+│   ├── requirements.txt     # Python dependencies
+│   ├── src/
+│   │   ├── app.py           # Flask backend (API + static server)
+│   │   └── static/          # Frontend SPA
+│   │       ├── index.html   # UI entry point
+│   │       ├── app.js       # SPA logic
+│   │       └── styles.css   # Styling
+│   └── tests/
+│       └── test_app.py      # Unit tests
+├── argo/                    # GitOps manifests
+│   ├── application.yaml     # ArgoCD application definition
+│   └── project.yaml         # ArgoCD project configuration
+├── helm/                    # Helm chart for Kubernetes
+│   └── myapp/
+│       ├── Chart.yaml       # Chart metadata
+│       ├── values.yaml      # Default configuration values
+│       └── templates/       # Kubernetes manifests (parametrized)
+│           ├── deployment.yaml
+│           ├── service.yaml
+│           ├── ingress.yaml
+│           ├── role.yaml
+│           ├── rolebinding.yaml
+│           └── serviceaccount.yaml
+├── jenkins/
+│   └── Jenkinsfile          # Jenkins pipeline (build, push, deploy)
+└── terraform/               # Infrastructure as Code (AWS)
+    ├── main.tf              # Root configuration
+    ├── vpc.tf               # Networking (VPC, subnets)
+    ├── eks.tf               # EKS cluster
+    ├── ec2_jenkins.tf       # EC2 instance for Jenkins
+    ├── documentdb.tf        # Example DocumentDB resource
+    ├── s3.tf                # S3 bucket for artifacts
+    ├── variables.tf         # Input variables
+    ├── outputs.tf           # Outputs for reference
+    ├── versions.tf          # Required provider versions
+    └── tfplan               # Example Terraform plan
+```    
 Quick start (local)
 1. Build and run with Docker:
 
@@ -60,33 +141,8 @@ Infrastructure & CD (how the pieces fit together)
   `application.yaml` points to `helm/myapp` in this repository and can be used
   by ArgoCD to auto-sync the application into a cluster.
 
-If you want, I can next wire GitHub Actions to publish to GHCR and invoke
-Helm to deploy to a cluster (you'll need to provide registry credentials and
-kubeconfig as repository secrets). This will complete an end-to-end CI/CD
-demo flow.
 
-License
-MIT — demo code
-
----
-
-Deploying the static demo to Netlify (quick demo for interviewers)
-
-1. Netlify serves static sites. This project includes a static SPA under
-   `app/src/static/`. The SPA has a fallback to call GitHub public API
-   directly if the backend `/api` is not available (suitable for demos).
-
-2. To deploy the static SPA to Netlify:
-
-   - Create a new site on Netlify pointing to this GitHub repository.
-   - Set the build command to: `echo "no build"` (the site is static) or leave empty.
-   - Set the publish directory to: `app/src/static`
-
-   The Netlify site will serve the SPA. For full functionality (authenticated
-   GitHub API, higher rate limits), run the Flask backend on a server and
-   configure the SPA to call the backend API (CORS is allowed by the demo).
-
-Architecture overview (concise, English)
+Architecture overview 
 
 - Frontend (SPA): `app/src/static/` — Single-page dashboard that fetches
   profile metrics. Designed to run either with the backend (preferred) or as
@@ -116,109 +172,18 @@ Planned / Future improvements (explicitly documented)
 - Add a GitHub Actions job to build -> push to GHCR -> deploy with Helm to a dev cluster.
 - Add automated E2E smoke tests (Playwright) and vulnerability scanning in CI.
 
-If you want, I will implement the Netlify deployment config and the GHCR
-publishing step next so the repository is fully push-ready with a live demo
-URL in the README.
-
-Notes about avatar fallback and repo ordering
-
-- Avatar fallback: If a GitHub profile does not expose an avatar or it's
-  missing for some reason, the backend provides a sensible default avatar so
-  the UI never breaks (this prevents empty images in the demo).
-
-- Repo ordering: Repositories are sorted by most recent `pushed_at` (newest
-  first) so the UI highlights the candidate's most recent work. Language
-  labels are normalized and unknown values are shown as `Unknown`.
 
 
-
-Contact & Ownership
-
-Federico Rormoser © 2025 — demo project. Contact: https://www.linkedin.com/in/federico-rormoser/ • https://github.com/frormoser/
-
----
-
-Descripción corta (Español)
-
-Esta aplicación demo muestra métricas públicas de un perfil de GitHub de forma profesional y lista para entrevistas. Permite ingresar cualquier nombre de usuario público y ver: seguidores, repositorios públicos, estrellas totales, lenguajes usados y los repositorios más recientes. El proyecto está pensado como ejemplo de buenas prácticas de DevOps: incluye Docker, ejemplos de CI/CD (GitHub Actions y Jenkins), Helm y Terraform como punto de partida.
-
-
-
-Cómo probar localmente (rápido)
-
-1. Construir y ejecutar con Docker (PowerShell):
-
-```powershell
-docker build -t gh-profile-demo -f app/Dockerfile app; 
-docker run -p 5000:5000 gh-profile-demo
-```
-
-2. Abrir http://localhost:5000 y escribir un usuario público de GitHub.
-
-Checklist para push (listo para entrevista)
-
-1. Asegúrate de tener todo commiteado:
-
-```powershell
-git add .; git commit -m "chore(demo): finalize UI, Netlify fallback, DevOps manifests, README"; git push origin main
-```
-
-2. (Opcional) Conectar el repositorio a Netlify y establecer el directorio de publicación a `app/src/static`.
-
-3. Compartir la URL con entrevistadores. Ellos pueden escribir un nombre de usuario público y ver las métricas.
-
-Architecture diagram (Mermaid)
-
-```mermaid
-flowchart LR
-  subgraph Dev
-    DevMachine[Developer Machine]
-    GitHub[GitHub Repo]
-  end
-
-  subgraph CI/CD
-    GH_Actions[GitHub Actions CI]
-    Jenkins[Jenkins - optional]
-    GHCR[Container Registry]
-  end
-
-  subgraph Infra
-    K8s[Kubernetes Cluster]
-    Argo[ArgoCD - optional]
-    S3[S3 artifacts]
-  end
-
-  DevMachine --> GitHub
-  GitHub --> GH_Actions
-  GH_Actions --> GHCR
-  GH_Actions --> Jenkins
-  GHCR --> K8s
-  Jenkins --> K8s
-  GitHub --> Argo
-  GH_Actions --> S3
-
-  K8s -->|serves| App[Flask App]
-  App -->|serves static| SPA[SPA static]
-  SPA -->|fetch| App
-  SPA -->|fallback| GitHub
-```
-
-Quick push checklist (ready for interview/demo)
-
-1. Verify tests: `python -m pytest -q app/tests`
-2. Commit all changes and push to GitHub:
-
-```bash
-git add .
-git commit -m "chore(demo): finalize UI, Netlify fallback, DevOps manifests, README"
-git push origin main
-```
-
-3. (Optional) Connect the repository to Netlify and set publish directory to `app/src/static`.
-
-4. Share the Netlify URL with interviewers. They can enter a public GitHub username and see metrics.
-
-Future work
-- Full CI pipeline to publish the Docker image to GHCR and deploy to a dev cluster.
-- Replace demo in-memory cache with Redis for production readiness.
-
+# 📫 Contact  
+## 👨‍💻 Federico Rormoser © 2025 
+<p align="center">
+  <a href="mailto:joelrormoser@gmail.com">
+    <img src="https://img.shields.io/badge/Email-D14836?style=for-the-badge&logo=gmail&logoColor=white" />
+  </a>
+  <a href="https://www.linkedin.com/in/federico-rormoser/">
+    <img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" />
+  </a>
+  <a href="https://github.com/frormoser">
+    <img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" />
+  </a>
+</p>  
